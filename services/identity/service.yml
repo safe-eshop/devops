@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: identity-service
+  namespace: safe-shop
+  labels:
+    service: identity-service
+    app: identity
+spec:
+  selector:
+    app: identity
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: NodePort
+    
