@@ -1,9 +1,35 @@
-version: '3.3'
+version: '3'
 
 services:
-  identity.api:
-    image: safeshop/identity:master
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://0.0.0.0:80
-      - PATH_BASE=/identity
+  catalog-import: 
+    image: ghcr.io/safe-eshop/catalog.import:master
+    env:
+      MONGODB_URL: rabbitmq
+      RABBITMQ_EXCHANGE: 5672
+      RABBITMQ_TOPIC: guest
+      RABBITMQ_CONNECTION: guest
+    depends_on: 
+      - rabbitmq
+      - catalogdb  
+  catalog:
+    image: ghcr.io/safe-eshop/catalog:master
+    env:
+      MONGODB_URL: rabbitmq
+    depends_on: 
+      - catalogdb
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  catalogdb:
+    image: mongo:latest
+    restart: unless-stopped
+    ports: 
+      - '27017:27017'
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:
