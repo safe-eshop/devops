@@ -3,26 +3,31 @@ version: '3'
 services:
   catalog-import: 
     image: ghcr.io/safe-eshop/catalog.import:master
-    env:
-      MONGODB_URL: rabbitmq
-      RABBITMQ_EXCHANGE: 5672
-      RABBITMQ_TOPIC: guest
-      RABBITMQ_CONNECTION: guest
+    environment:
+      MONGODB_URL: mongodb://catalogdb:27017
+      RABBITMQ_CONNECTION: amqp://guest:guest@rabbitmq:5672/"
     depends_on: 
       - rabbitmq
       - catalogdb  
   catalog:
     image: ghcr.io/safe-eshop/catalog:master
-    env:
+    environment:
       MONGODB_URL: rabbitmq
     depends_on: 
       - catalogdb
+  warehouse:
+    image: ghcr.io/safe-eshop/warehouse:master
+    environment:
+      RABBITMQ_CONNECTION: amqp://guest:guest@rabbitmq:5672/"
+      REDIS_CONNECTION: redis:6379
+    depends_on:
+      - catalog
+      - warehousedb
   rabbitmq:
     image: rabbitmq:3.8-management
     ports:
       - '5672:5672'
       - '15672:15672'
-
   catalogdb:
     image: mongo:latest
     restart: unless-stopped
@@ -30,6 +35,10 @@ services:
       - '27017:27017'
     volumes:
       - mongodb-data:/data/db
+  warehousedb: 
+    image: redis:alpine
+    ports:
+      - '6379:6379'
 
 volumes:
   mongodb-data:
