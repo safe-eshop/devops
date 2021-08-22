@@ -4,8 +4,8 @@ services:
   catalog-import: 
     image: ghcr.io/safe-eshop/catalog.import:master
     environment:
-      MONGODB_URL: mongodb://catalogdb:27017
-      RABBITMQ_CONNECTION: amqp://guest:guest@rabbitmq:5672/"
+      MONGODB_URL: "mongodb://catalogdb:27017"
+      RABBITMQ_CONNECTION: "amqp://guest:guest@rabbitmq:5672/"
     depends_on: 
       - rabbitmq
       - catalogdb  
@@ -18,10 +18,11 @@ services:
   warehouse:
     image: ghcr.io/safe-eshop/warehouse:master
     environment:
-      RABBITMQ_CONNECTION: amqp://guest:guest@rabbitmq:5672/"
-      REDIS_CONNECTION: redis:6379
+      RABBITMQ_CONNECTION: "amqp://guest:guest@rabbitmq:5672/"
+      REDIS_CONNECTION: "warehousedb:6380"
     depends_on:
       - catalog
+      - rabbitmq
       - warehousedb
   rabbitmq:
     image: rabbitmq:3.8-management
@@ -38,7 +39,7 @@ services:
   warehousedb: 
     image: redis:alpine
     ports:
-      - '6379:6379'
+      - '6380:6379'
 
 volumes:
   mongodb-data:
