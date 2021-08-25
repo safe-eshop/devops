@@ -13,13 +13,17 @@ services:
     image: ghcr.io/safe-eshop/catalog:master
     environment:
       MONGODB_URL: "mongodb://catalogdb:27017"
+    ports: 
+      - "5002:8080"
     depends_on: 
       - catalogdb
   warehouse:
     image: ghcr.io/safe-eshop/warehouse:master
     environment:
-      REDIS_CONNECTION: "warehousedb:6380"
+      REDIS_CONNECTION: "warehousedb:6379"
       RABBITMQ_CONNECTION: "amqp://guest:guest@rabbitmq:5672/"
+    ports: 
+      - "5001:8080"
     depends_on:
       - catalog
       - rabbitmq
